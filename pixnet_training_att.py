@@ -31,9 +31,9 @@ X_train,Y_train =shuffle(X_train,Y_train,random_state=100)
 
 ''' set the size of mini-batch and number of epochs'''
 batch_size = 100
-nb_epoch = 200
-INPUT_DIM = 800
-TIME_STEPS = 17
+nb_epoch = 24
+INPUT_DIM = 100
+TIME_STEPS = 7
 
 ''' Import keras to build a DL model '''
 
@@ -82,7 +82,7 @@ model.add(TimeDistributed(Dense(INPUT_DIM)))
 model.add(Activation('linear'))
 
 from keras.optimizers import RMSprop
-rmsprop = RMSprop(lr=0.01, rho=0.9, epsilon=1e-08, decay=0.0)
+rmsprop = RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0)
 
 model.compile(loss= 'mean_squared_error',
               		optimizer=rmsprop,
@@ -92,7 +92,7 @@ print('Train...')
 
 history_adam = model.fit([X_train, X_train], Y_train,
 							batch_size=batch_size,
-							nb_epoch=nb_epoch,
+							epochs=nb_epoch,
 							verbose=1,
 							shuffle=True,
                     		validation_split=0.1)
@@ -106,5 +106,14 @@ val_loss_adam = history_adam.history.get('val_loss')
 # pickle.dump(model_adam, output)
 # output.close()
 
-model.save('model_att.h5')
+# model.save('model_att.h5')
+jsonstring = model.to_json()
+
+with open('model_att.json', 'w') as json_file:
+	json_file.write(jsonstring)
+json_file.close()
+
+model.save_weights('model_att_weights.h5')
+print('save model to disk')
+
 #print(np.array(val_acc_adam))
